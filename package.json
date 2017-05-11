@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/droganaida/test.git"
+    "url": "https://github.com/droganaida/javascript-backend.git"
   },
   "license": "ISC",
   "dependencies": {
