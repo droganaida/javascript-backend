@@ -1,0 +1,10 @@
+<main role="main">
+    <h1><%=category.title%></h1>
+    <%-category.description%>
+    <div class="article-holder">
+        <%-include ../modules/articleItemArray%>
+    </div>
+    <% if (showMore){ %>
+    <%-include ../modules/moreButton%>
+    <% } %>
+</main>

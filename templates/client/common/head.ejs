@@ -1,0 +1,27 @@
+<head>
+    <title><%=metatitle%></title>
+    <meta charset="UTF-8">
+    <meta name="description" content="<%=metadescription%>">
+    <meta name="keywords" content="<%=metakeywords%>">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="og:image" content="<%=socialimage%>">
+    <% if (pagenoindex == 'yes') { %>
+        <meta name="robots" content="noindex, nofollow">
+    <% } else { %>
+        <meta name="robots" content="index, follow">
+    <% } %>
+    <link rel="shortcut icon" href="/images/icons/favicon-32x32.png">
+    <% languages.forEach(function(lang){
+        var langUrl = ""
+        if (!lang.default){
+            langUrl = "?language=" + lang.name
+        }
+    %>
+        <link rel="alternate" hreflang="<%=lang.name%>" href="<%=pageurl%><%=langUrl%>">
+    <% }) %>
+    <% if (env == 'production') { %>
+        <link rel="stylesheet" href="/styles/main.min.css">
+    <% } else { %>
+        <link rel="stylesheet" href="/styles/main.css">
+    <% } %>
+</head>

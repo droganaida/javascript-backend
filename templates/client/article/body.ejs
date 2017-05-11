@@ -1,0 +1,26 @@
+<%-include ../modules/dateParser%>
+<main role="main">
+    <div class="article-wrapper">
+        <article>
+            <% if (article.image && (article.image.length > 0)){%>
+                <img src="<%=article.image%>" alt="<%=article.title%>">
+            <% } else if (article.parent && article.parent.image && (article.parent.image.length > 0)) { %>
+                <img src="<%=article.parent.image%>" alt="<%=article.title%>">
+            <% } %>
+            <div class="details">
+                <div class="secondary">
+                    <span class="date"><%=locals.navigations.published[language]%><%=dateParser(article.moderated)%></span>
+                    <span class="views"><%=locals.navigations.views[language]%><%=article.views%></span>
+                </div>
+                <h1><%=article.title%></h1>
+                <%-article.description%>
+            </div>
+        </article>
+        <aside>
+            <%-include ../modules/tags%>
+            <% relarticles.forEach(function(article) { %>
+            <%-include ../modules/sideArticleItem%>
+            <% }) %>
+        </aside>
+    </div>
+</main>

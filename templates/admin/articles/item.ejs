@@ -1,0 +1,33 @@
+<%-include ../modules/dateParser%>
+<% articles.forEach(function(item) { %>
+<div class="v-item flex-row" id="<%=item._id%>">
+    <div class="image">
+        <%
+            var img = noimage
+            if (item.image && (item.image.length > 0)) {
+                img = item.image
+            }
+            var ext = img.substr(img.indexOf('.'))
+            img = img.substr(0, img.indexOf('.'))
+        %>
+        <img src="<%=img%>-min<%=ext%>" width="40" height="40" alt="<%=item.title%>">
+    </div>
+    <div class="title"><%=item.title%></div>
+    <div class="created flex-col">
+        <span>Создана: <%=dateParser(item.created)%></span>
+        <% if (item.moderated) { %>
+        <span>Обновлена: <%=dateParser(item.moderated)%></span>
+        <% } %>
+    </div>
+    <div class="published">
+        <% if (item.published) { %>
+        <span class="yes">Опубликована</span>
+        <% } else { %>
+        <span class="no">Не опубликована</span>
+        <% } %>
+    </div>
+    <div class="buttons">
+        <a href="/admin/article/<%=category._id%>/<%=item._id%>" class="button green">Редактор</a>
+    </div>
+</div>
+<% })%>

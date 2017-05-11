@@ -1,0 +1,15 @@
+<div class="holder type">
+    <div class="options-header">
+        <div id="b-new-category" class="button green">Добавить категорию +</div>
+    </div>
+    <div class="holder c-holder">
+        <div class="blog-content">
+            <ul class="ui-sortable" id="sortable">
+                <% categories.forEach(function(item){
+                %>
+                    <% include ./item %>
+                <% }) %>
+            </ul>
+        </div>
+    </div>
+</div>

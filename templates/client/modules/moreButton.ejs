@@ -1,0 +1,5 @@
+<% if (page == 'category') { %>
+<div class="more" data-language="<%=language%>" data-ismain="<%=category.ismain%>" data-category="<%=category._id%>" data-last="<%=from%>"><%=locals.navigations.more[language]%></div>
+<% } else if (page == 'tags') { %>
+<div class="more" data-language="<%=language%>" data-tag="<%=tag%>" data-last="<%=from%>"><%=locals.navigations.more[language]%></div>
+<% } %>

@@ -1,0 +1,68 @@
+<%
+    var mainClass = ""
+    var hideMainArticles = false
+    if (item.ismain) {
+        mainClass = "ismain"
+        if (item.articlecount == 0){
+            hideMainArticles = true
+        }
+    }
+%>
+<li class="ui-state-default ui-sortable-handle <%=mainClass%>" id="<%=item._id%>" data-title="<%=item.title%>" data-alias="<%=item.alias%>" data-articlecount="<%=item.articlecount%>">
+    <%
+        function SpeakRussian(artCount){
+
+            artCount = artCount.toString();
+            var countWord = "";
+            var variants = ['статья', 'статьи', 'статей'];
+
+            switch (artCount[artCount.length - 1]){
+                case '1':
+                    if ((artCount.length == 2) && (artCount[0] == '1')) {
+                        countWord = variants[2];
+                    } else {
+                        countWord = variants[0];
+                    }
+                    break;
+                case '2':
+                case '3':
+                case '4':
+                    if ((artCount.length == 2) && (artCount[0] == '1')) {
+                        countWord = variants[2];
+                    } else {
+                        countWord = variants[1];
+                    }
+                    break;
+                default :
+                    countWord = variants[2];
+            }
+
+            return countWord;
+
+        }
+
+        var articlecount = item.articlecount;
+        if (!articlecount) {
+            articlecount = 0;
+        }
+
+        var countWord = SpeakRussian(articlecount);
+        var names = [countWord, 'Статьи'];
+
+    %>
+    <div class="text">
+        <span class="title"><%=item.title%></span>
+        <%
+            var subtitle = articlecount + " " + names[0]
+            if (item.ismain) {
+                subtitle = "Главная страница (" + subtitle + ")"
+        } %>
+        <span class="small"><%=subtitle%></span>
+    </div>
+    <div class="buttons">
+        <% if (!hideMainArticles) { %>
+            <a href="/admin/articles/<%=item._id%>" class="article"><%=names[1]%></a>
+        <% } %>
+        <a href="/admin/editcategory/<%=item._id%>" class="edit">Редактор</a>
+    </div>
+</li>

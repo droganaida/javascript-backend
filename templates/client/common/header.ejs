@@ -1,0 +1,45 @@
+<header>
+    <a href="/<%=urltail%>">
+        <img src="/images/backgrounds/logo.png" alt="<%=companyname%>" width="110" height="36"/>
+    </a>
+    <div>
+        <nav id="language">
+            <ul>
+                <% languages.forEach(function(lang){
+                    var langUrl = ""
+                    if (!lang.default){
+                        langUrl = "?language=" + lang.name
+                    }
+                    var activeLang = ""
+                    if ((language == lang.name) || (language == "default" && lang.default)){
+                        activeLang = "active"
+                    }
+                %>
+                    <li class="<%=activeLang%>">
+                        <a href="<%=pageurl%><%=langUrl%>" hreflang="<%=lang.name%>">
+                            <abbr lang="<%=lang.name%>" title="<%=lang.alias%>"><%=lang.name%></abbr>
+                        </a>
+                    </li>
+                <% }) %>
+            </ul>
+        </nav>
+        <nav role="navigation">
+            <ul>
+                <% categories.forEach(function(cat){
+                    var catActive = ""
+                    if (category && (cat.alias == category.alias)){
+                        catActive = "active"
+                    }
+                    var catName = cat.title
+                    if (cat.menutitle && (cat.menutitle.length > 0)){
+                        catName = cat.menutitle
+                    }
+                %>
+                <li>
+                    <a href="/<%=cat.alias%><%=urltail%>" class="<%=catActive%>"><%=catName%></a>
+                </li>
+                <% })%>
+            </ul>
+        </nav>
+    </div>
+</header>

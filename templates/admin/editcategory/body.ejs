@@ -1,0 +1,122 @@
+<%-include ../modules/dateParser%>
+<div class="holder type flex-container flex-col padding20" id="<%=category.cattype%>">
+    <div class="options-header">
+        <%
+            var cparent = parent;
+
+            if (lang == "default") {
+                cparent = category._id;
+            }
+        %>
+        <%
+            languages.forEach(function(langitem){
+
+                var activelang = "";
+                if ((langitem.name == lang) || (langitem.default && (lang == "default"))){
+                    activelang = "active";
+                }
+                var urlPostfix = ""
+                if (!langitem.default){
+                    urlPostfix = "/" + langitem.name
+            }
+        %>
+           <a href="/admin/editcategory/<%=cparent%><%=urlPostfix%>" class="button <%=activelang%>"><%=langitem.name%></a>
+        <% }) %>
+        <% if (!category.isroot) { %>
+            <div class="crumbs flex-dominant"><%-crumbs%></div>
+        <% } %>
+    </div>
+    <div class="flex-row flex-full">
+        <div class="flex-col flex-half padding20">
+            <div class="input-row">
+                <label for="title">Заголовок категории</label>
+                <input type="text" id="title" value="<%=category.title%>">
+            </div>
+            <% if (lang == "default") { %>
+                <div class="input-row">
+                    <label for="alias">URL категории (без домена и /)</label>
+                    <input type="text" id="alias" value="<%=category.alias%>">
+                </div>
+            <% } %>
+            <div class="input-row">
+                <label for="menutitle">Заголовок категории в меню</label>
+                <input type="text" id="menutitle" value="<%=category.menutitle%>">
+            </div>
+        </div>
+        <div class="flex-col flex-half padding20">
+            <div class="input-row">
+                <label for="htmltitle">META title</label>
+                <input type="text" id="htmltitle" value="<%=category.htmltitle%>">
+            </div>
+            <div class="input-row">
+                <label for="htmldescription">META description</label>
+                <input type="text" id="htmldescription" value="<%=category.htmldescription%>">
+            </div>
+            <div class="input-row">
+                <label for="htmlkeywords">META keywords</label>
+                <input type="text" id="htmlkeywords" value="<%=category.htmlkeywords%>">
+            </div>
+        </div>
+    </div>
+    <% if ((parent == 'me') && (page == 'editcategory')){ %>
+    <div class="flex-col flex-full padding20">
+        <div class="input-row flex-row">
+            <%
+                var ismainclass = ""
+                if (category.ismain){
+                    ismainclass = "active"
+                }
+            %>
+            <span class="checker ismain <%=ismainclass%>" data-relna="cat-holder"></span>
+            <span class="label">Главная страница</span>
+        </div>
+    </div>
+    <% } %>
+    <div class="flex-col flex-full padding20">
+        <label for="shortdescription">Краткое описание</label>
+        <textarea id="shortdescription"><%=category.shortdescription%></textarea>
+    </div>
+    <div class="flex-col flex-full padding20">
+        <div class="mediaelement article-mediadescr clear">
+            <label for="mediacontent">Текст на странице категории</label>
+            <div class="mediacontent" style="display: none"><%-category.description%></div>
+        </div>
+    </div>
+    <div class="flex-col flex-full padding20">
+        <div class="open-bayan link">История модерации:</div>
+        <div class="bayan v-list">
+            <div class="v-item flex-row">
+                <div class="title"><%=category.creator%></div>
+                <div class="created flex-col">
+                    <span>Создана: <%=dateParser(category.created)%></span>
+                </div>
+            </div>
+            <% if (category.moderatedhistory && (category.moderatedhistory.length > 0)) {
+                    category.moderatedhistory.forEach(function(item){ %>
+                        <div class="v-item flex-row">
+                            <div class="title"><%=item.moderator%></div>
+                            <div class="created flex-col">
+                                <span>Отмодерирована: <%=dateParser(item.date)%></span>
+                            </div>
+                        </div>
+            <% })
+            }
+            %>
+        </div>
+    </div>
+    <div class="flex-col flex-full padding20">
+        <div class="buttons id-info flex-row flex-centered" data-parent="<%=parent%>" data-lang="<%=lang%>" id="<%=category._id%>">
+            <div class="button green" id="edit-category">Сохранить</div>
+            <% if ((adminrights == "superadmin") || !category.isroot) { %>
+                <div class="button red" id="delete-category" data-bloglabel="<%=category.rootcategory%>">Удалить</div>
+            <% } %>
+            <% if (category.isroot) { %>
+                <a href="/admin/categories" class="button">Отмена</a>
+            <% } else if (category.rootcategory == 'me') { %>
+                <a href="/admin/blogcategories" class="button">Отмена</a>
+            <% } else { %>
+                <a href="/admin/categories/<%=category.rootcategory%>" class="button">Отмена</a>
+            <% } %>
+        </div>
+    </div>
+</div>

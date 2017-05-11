@@ -1,0 +1,19 @@
+<main role="main">
+    <% if (notfound) { %>
+        <div class="notfoundpage">
+            <p><%=locals.messages.notfound.title[language]%><%=tag%></p>
+            <p class="small"><%=locals.messages.notfound.text[language]%></p>
+            <div class="sad"></div>
+        </div>
+    <% } else { %>
+        <h1><%=locals.messages.found[language]%><%=tag%></h1>
+        <div class="article-holder">
+            <% articles.forEach(function(article) { %>
+            <%-include ../modules/articleItem%>
+            <% }) %>
+        </div>
+        <% if (showMore){ %>
+            <%-include ../modules/moreButton%>
+        <% } %>
+    <% } %>
+</main>

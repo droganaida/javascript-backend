@@ -1,0 +1,21 @@
+<header>
+    <div class="flex-row flex-full">
+        <div class="title"><span>Вход в админ-панель</span></div>
+        <% if (page != "login") { %>
+            <div class="title">Вы вошли как <span id="moderator"><%=adminname%></span></div>
+            <div class="buttons">
+                <a href="/admin/logout">Выход</a>
+                <a href="/" target="_blank"><%=companyname%></a>
+                <%
+                    var catActive = ""
+                    switch (page){
+                        case "categories":
+                            catActive = "active"
+                            break
+                    }
+                %>
+                <a href="/admin/categories" class="<%=catActive%>">Разделы</a>
+            </div>
+        </div>
+    <% } %>
+</header>

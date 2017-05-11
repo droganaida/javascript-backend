@@ -1,0 +1,7 @@
+<% if (article.tags && (article.tags.length > 0)) { %>
+    <div class="tags">
+        <% article.tags.forEach(function(tag){ %>
+            <a href="/articles/<%=tag%>">#<%=tag%></a>
+        <% }) %>
+    </div>
+<% } %>

@@ -1,0 +1,72 @@
+<% dateParser = function(date) {
+    var startDate = new Date(date);
+    var startDay = (startDate.getDate() < 10 ? '0' + startDate.getDate() : startDate.getDate());
+    var startYear = startDate.getFullYear()
+    var startMonth = ''
+    var weekDay = ''
+    switch (startDate.getMonth()){
+        case 0:
+            startMonth = locals.month[language][0]
+            break;
+        case 1:
+            startMonth = locals.month[language][1]
+            break;
+        case 2:
+            startMonth = locals.month[language][2]
+            break;
+        case 3:
+            startMonth = locals.month[language][3]
+            break;
+        case 4:
+            startMonth = locals.month[language][4]
+            break;
+        case 5:
+            startMonth = locals.month[language][5]
+            break;
+        case 6:
+            startMonth = locals.month[language][6]
+            break;
+        case 7:
+            startMonth = locals.month[language][7]
+            break;
+        case 8:
+            startMonth = locals.month[language][8]
+            break;
+        case 9:
+            startMonth = locals.month[language][9]
+            break;
+        case 10:
+            startMonth = locals.month[language][10]
+            break;
+        case 11:
+            startMonth = locals.month[language][11]
+            break;
+    }
+
+    switch (startDate.getDay()){
+        case 0:
+            weekDay = locals.days[language][0];
+            break;
+        case 1:
+            weekDay = locals.days[language][1];
+            break;
+        case 2:
+            weekDay = locals.days[language][2];
+            break;
+        case 3:
+            weekDay = locals.days[language][3];
+            break;
+        case 4:
+            weekDay = locals.days[language][4];
+            break;
+        case 5:
+            weekDay = locals.days[language][5];
+            break;
+        case 6:
+            weekDay = locals.days[language][6];
+            break;
+    }
+    startDate = weekDay + ', ' + startDay + '. ' + startMonth + ' ' + startYear;
+    return startDate;
+}
+%>

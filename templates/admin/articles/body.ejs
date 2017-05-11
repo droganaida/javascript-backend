@@ -1,0 +1,11 @@
+<div class="holder type">
+    <div class="options-header">
+        <a href="/admin/article/<%=category.id%>/new" class="button green">Добавить статью +</a>
+    </div>
+    <div class="search padding20">
+        <input type="text" id="search-article" placeholder="Введите название статьи">
+    </div>
+    <div class="articles v-list flex-full padding20">
+        <% include ./item %>
+    </div>
+</div>

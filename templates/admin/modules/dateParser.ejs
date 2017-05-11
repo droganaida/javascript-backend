@@ -1,0 +1,71 @@
+<% dateParser = function(date) {
+    var startDate = new Date(date);
+    var startDay = (startDate.getDate() < 10 ? '0' + startDate.getDate() : startDate.getDate());
+    var startMonth = ''
+    var weekDay = ''
+    switch (startDate.getMonth()){
+        case 0:
+            startMonth = 'Янв'
+            break;
+        case 1:
+            startMonth = 'Фев'
+            break;
+        case 2:
+            startMonth = 'Март'
+            break;
+        case 3:
+            startMonth = 'Апр'
+            break;
+        case 4:
+            startMonth = 'Май'
+            break;
+        case 5:
+            startMonth = 'Июнь'
+            break;
+        case 6:
+            startMonth = 'Июль'
+            break;
+        case 7:
+            startMonth = 'Авг'
+            break;
+        case 8:
+            startMonth = 'Сен'
+            break;
+        case 9:
+            startMonth = 'Окт'
+            break;
+        case 10:
+            startMonth = 'Нояб'
+            break;
+        case 11:
+            startMonth = 'Дек'
+            break;
+    }
+
+    switch (startDate.getDay()){
+        case 0:
+            weekDay = 'Вс';
+            break;
+        case 1:
+            weekDay = 'Пн';
+            break;
+        case 2:
+            weekDay = 'Вт';
+            break;
+        case 3:
+            weekDay = 'Ср';
+            break;
+        case 4:
+            weekDay = 'Чт';
+            break;
+        case 5:
+            weekDay = 'Пт';
+            break;
+        case 6:
+            weekDay = 'Сб';
+            break;
+    }
+    startDate = weekDay + ', ' + startDay + '. ' + startMonth + ' ' + startDate.getFullYear() + ', в ' + startDate.getHours() + ':' + startDate.getMinutes()
+    return startDate;
+}
+%>

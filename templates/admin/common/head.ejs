@@ -1,0 +1,24 @@
+<head>
+    <title>Админ-панель</title>
+    <meta charset="UTF-8">
+    <%
+        var tstamp = new Date();
+        tstamp = tstamp.getMilliseconds();
+    %>
+    <% if (env == 'production') { %>
+        <link rel="stylesheet" href="/styles/admin.min.css?version=<%-tstamp%>">
+    <% } else { %>
+        <link rel="stylesheet" href="/styles/admin.css">
+    <% } %>
+    <script src="/scripts/jquery-1.10.2-min.js"></script>
+    <script src="/scripts/jquery-ui-min.js"></script>
+    <script src="/scripts/admin/texthighlighter/rangy-core.js"></script>
+    <script src="/scripts/admin/texthighlighter/jquery.texthighlighter.js"></script>
+    <% if (env == 'production') { %>
+        <%- include ./minscriptpack %>
+    <% } else { %>
+        <%- include ./scriptpack %>
+    <% } %>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="shortcut icon" href="/images/icons/adminfavicon.png">
+</head>
