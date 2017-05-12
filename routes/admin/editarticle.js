@@ -154,7 +154,7 @@ exports.post = function(req, res){
                     } else {
 
                         checkTags(function(){
-                            res.send({id : article._id});
+                            res.send({id : req.body.id});
                         });
                     }
                 });
