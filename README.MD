@@ -1,6 +1,6 @@
-## Developing
+## Запускаем проект
 
-Start a dev server at `localhost:3002`:
+Стартуем сервер по адресу `localhost:3002`:
 
 ```
 $ npm install
