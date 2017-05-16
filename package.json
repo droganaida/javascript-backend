@@ -13,7 +13,8 @@
     "url": "https://github.com/droganaida/javascript-backend.git"
   },
   "scripts": {
-    "dev": "cross-env NODE_ENV=development node app.js --nouse-idle-notification --expose-gc"
+    "dev": "cross-env NODE_ENV=development node --nouse-idle-notification --expose-gc app.js",
+    "pro": "cross-env NODE_ENV=production node --nouse-idle-notification --expose-gc app.js"
   },
   "license": "ISC",
   "dependencies": {

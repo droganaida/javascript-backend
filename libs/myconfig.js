@@ -30,7 +30,7 @@ myconfig.images = {
 //============================================================//
 myconfig.mongoose = {
     uri: "mongodb://127.0.0.1/superblog",
-        options: {
+    options: {
         server: {
             socketOptions: {
                 keepAlive: 1
@@ -44,11 +44,10 @@ myconfig.mongoose = {
 //============================================================//
 myconfig.session = {
     "secret": "nodeJSForever",
-        "key": "sid",
-        "cookie": {
-        "path": "/",
-            "httpOnly": true,
-            "maxAge": null
+    "key": "sid",
+    "cookie": {
+        "httpOnly": true,
+        "maxAge": null
     }
 };
 

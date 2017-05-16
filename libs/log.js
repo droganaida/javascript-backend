@@ -13,8 +13,7 @@ function getLogger(module) {
             }),
             new (winston.transports.File)({
                 filename: 'node.log',
-                label: path,
-                colorize: true
+                label: path
             })
         ]
     });

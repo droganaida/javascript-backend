@@ -132,6 +132,6 @@ if (cluster.isMaster) {
 process.on('uncaughtException', function (err) {
     log.error((new Date).toUTCString() + ' uncaughtException:', err.message);
     log.error(err.stack);
-    process.exit(1)
+    process.exit(1);
 });
 
