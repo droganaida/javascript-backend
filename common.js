@@ -4,7 +4,6 @@ var Admins = require('./models/admins').Admin;
 var Categories = require('./models/categories').Category;
 var Myconfig = require('./libs/myconfig');
 var async = require('async');
-var Config = require('./libs/myconfig');
 
 exports.commonMiddleware = function (req, res, next){
 
@@ -49,6 +48,7 @@ exports.commonMiddleware = function (req, res, next){
     function getEnvironment(callback){
 
         var originalPageUrl = req.originalUrl;
+
         if (originalPageUrl.indexOf('?') != -1){
             originalPageUrl = originalPageUrl.substr(0, originalPageUrl.indexOf('?'));
         }
@@ -119,7 +119,7 @@ exports.commonMiddleware = function (req, res, next){
 
         var date = new Date();
         var month = date.getMonth();
-        month = Config.locals.month[language][month];
+        month = Myconfig.locals.month[language][month];
 
         res.locals.currentdate = month;
         res.locals.fullyear = date.getFullYear();

@@ -2,7 +2,6 @@
 var log = require('./log')(module);
 var compressor = require('node-minify');
 var config = require('../libs/myconfig');
-var fs = require('fs');
 var async = require('async');
 
 function makeProduction(callback) {
