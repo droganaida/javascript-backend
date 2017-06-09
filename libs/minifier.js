@@ -86,30 +86,23 @@ function minifyCss(callback){
         'admin.css',
         'main.css'];
 
-    var counter = 0;
-    var error = null;
-    for (var i=0; i<styles.length; i++){
+    async.each(styles, function (style, callback) {
 
         compressor.minify({
             compressor: 'clean-css',
-            input: cssPath + styles[i],
-            output: cssPath + styles[i].substr(0, styles[i].lastIndexOf('.')) + '.min.css',
+            input: cssPath + style,
+            output: cssPath + style.substr(0, style.lastIndexOf('.')) + '.min.css',
             options: {
                 advanced: false,
                 aggressiveMerging: false
             },
             callback: function (err) {
-                counter ++;
-                if (err) {
-                    error = err;
-                }
-                if (counter == styles.length) {
-                    callback(error);
-                }
+                callback(err);
             }
         });
-
-    }
+    }, function(err) {
+        callback(err);
+    });
 }
 
 process.stdout.write('makeProduction');
