@@ -44,15 +44,9 @@ if (cluster.isMaster) {
     app.set('view engine', 'ejs');
 
     app.use(bodyParser.urlencoded({
-        extended: true
+        extended: true,
+        limit: '50mb'
     }));
-
-
-    app.use(bodyParser.json({uploadDir:'./public/uploads', limit: '50mb'}));
-    app.use(bodyParser.json({limit: '50mb'}));
-    app.use(bodyParser.urlencoded({limit: '50mb'}));
-
-    app.set('uploadDir', path.join(__dirname, 'public/uploads'));
 
     app.use(multer(
         {

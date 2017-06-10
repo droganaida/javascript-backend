@@ -31,14 +31,13 @@ schema.virtual('password')
 
     .set(function(password){
 
-        this._plainPassword = password;
         this.salt = Math.random() + 'salt';
         this.hashedPassword = this.encryptPassword(password);
     })
 
     .get(function(){
 
-        return this._plainPassword
+        return 'Top secret!'
     });
 
 
@@ -46,7 +45,7 @@ schema.methods = {
 
     encryptPassword: function (password) {
 
-        return crypto.createHmac('sha1', this.salt).update(password).digest('hex');
+        return crypto.createHmac('sha256', this.salt).update(password).digest('hex');
     },
     checkPassword: function (password) {
 
