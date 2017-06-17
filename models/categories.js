@@ -71,28 +71,30 @@ schema.statics = {
 
         var Categories = this;
 
-        Categories.findOne({title:{$regex : new RegExp(title, "i")}}, function(err, categories){
-            if (err){
-
-                callback('Ошибка базы данных');
-            } else {
-                if (categories){
-
-                    callback('Такая категория уже создана');
+        Categories
+            .findOne({title:{$regex : new RegExp(title, "i")}})
+            .then(function (category) {
+                if (category) {
+                    throw 'Категория с таким ЗАГОЛОВКОМ уже существует!';
                 } else {
-
-                    var category = new Categories({title: title, alias: alias, position: position, creator: creator});
-
-                    category.save(function(err){
-                        if (err) {
-                            callback('Невозможно добавить категорию');
-                        } else {
-                            callback (null, category);
-                        }
-                    })
+                    return Categories.findOne({alias: alias})
                 }
-            }
-        })
+            })
+            .then(function (category) {
+                if (category) {
+                    throw 'Категория с таким URL уже существует!';
+                } else {
+                    var categoryDoc = new Categories({title: title, alias: alias, position: position, creator: creator});
+                    return categoryDoc.save();
+                }
+            })
+            .then( function (category) {
+                callback (null, category);
+            })
+            .catch(function (err) {
+                callback(err);
+            });
+
     },
     createLocal: function(parent, language, title, shortdescription, description, htmltitle, htmldescription, htmlkeywords, menutitle, creator, callback){
 
@@ -132,48 +134,77 @@ schema.statics = {
         });
 
     },
-    editCategory: function(language, categoryid, title, shortdescription, description, htmltitle, htmldescription, htmlkeywords, alias, menutitle, ismain, moderator, callback){
+    setMain: function (parentId, isMain, callback) {
 
-        var Categories = this;
-        var date = new Date();
-        var setParams = {};
-        setParams.title = title;
-        setParams.shortdescription = shortdescription;
-        setParams.description = description;
-        setParams.htmltitle = htmltitle;
-        setParams.htmldescription = htmldescription;
-        setParams.htmlkeywords = htmlkeywords;
-        setParams.menutitle = menutitle;
-
-        if (language == 'default'){
-            setParams.alias = alias;
-            setParams.ismain = ismain;
+        var params = {};
+        if (isMain){
+            params = {parent: parentId}
         }
 
         Categories.update(
-            {_id:categoryid},
-            {
-                $set:setParams
-
-            }, function(err, opt){
-                if (opt){
-                    var moderatedhistory = {};
-                    moderatedhistory.moderator = moderator;
-                    moderatedhistory.date = date;
-                    Categories.update(
-                        {_id: categoryid},
-                        {
-                            $push: {moderatedhistory: moderatedhistory}
-                        },
-                        function(){
-                            callback(null, opt);
-                        }
-                    )
+            params,
+            {$set: {
+                ismain: isMain
+            }},
+            {multi: true},
+            function(err){
+                if (err){
+                    callback(err);
                 } else {
-                    callback("Ошибка базы данных")
+                    callback(null);
                 }
+            });
+    },
+    editCategory: function(language, categoryid, title, shortdescription, description, htmltitle, htmldescription, htmlkeywords, alias, menutitle, ismain, moderator, callback){
+
+        var Categories = this;
+
+        Categories.findOne({alias: alias, lang: 'default'}, function(err, cat){
+
+            if (cat && (cat._id != categoryid)){
+                callback('Категория с таким URL уже существует!');
+            } else {
+                var date = new Date();
+                var setParams = {};
+                setParams.title = title;
+                setParams.shortdescription = shortdescription;
+                setParams.description = description;
+                setParams.htmltitle = htmltitle;
+                setParams.htmldescription = htmldescription;
+                setParams.htmlkeywords = htmlkeywords;
+                setParams.menutitle = menutitle;
+
+                if (language == 'default'){
+                    setParams.alias = alias;
+                    setParams.ismain = ismain;
+                }
+
+                Categories.update(
+                    {_id:categoryid},
+                    {
+                        $set:setParams
+
+                    }, function(err, opt){
+                        if (opt){
+                            var moderatedhistory = {};
+                            moderatedhistory.moderator = moderator;
+                            moderatedhistory.date = date;
+                            Categories.update(
+                                {_id: categoryid},
+                                {
+                                    $push: {moderatedhistory: moderatedhistory}
+                                },
+                                function(){
+                                    callback(null, opt);
+                                }
+                            )
+                        } else {
+                            callback("Ошибка базы данных")
+                        }
+                    }
+                )
             }
-        )
+        });
     },
     posUpdate: function(categoryid, pos, callback) {
 

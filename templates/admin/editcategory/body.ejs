@@ -22,9 +22,6 @@
         %>
            <a href="/admin/editcategory/<%=cparent%><%=urlPostfix%>" class="button <%=activelang%>"><%=langitem.name%></a>
         <% }) %>
-        <% if (!category.isroot) { %>
-            <div class="crumbs flex-dominant"><%-crumbs%></div>
-        <% } %>
     </div>
     <div class="flex-row flex-full">
         <div class="flex-col flex-half padding20">

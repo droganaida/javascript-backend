@@ -14,12 +14,12 @@ exports.get = function(req, res){
 
         function getArticlesCount(category, callback){
 
-            Articles.find({categories: (category._id).toString()}, function(err, articles){
-                if (articles && (articles.length > 0)){
-                    category.articlecount = articles.length;
-                } else {
-                    category.articlecount = 0;
+            Articles.count({categories: (category._id).toString()}, function (err, count) {
+                var articleCount = 0;
+                if (count){
+                    articleCount = count;
                 }
+                category.articlecount = articleCount;
                 var pos = indexArray.indexOf(category.id);
                 callback(category, pos);
             });

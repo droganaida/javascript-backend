@@ -8,79 +8,50 @@ exports.get = function(req, res){
     if (req.session.user) {
 
         res.locals.languages = MyConfig.languages;
-        res.locals.icons = MyConfig.icons;
 
         Categories.findOne({_id: req.params.id}, function(err, category){
 
             if (category){
 
-                if (
-                    (res.locals.adminrights == 'superadmin') ||
-                    ((res.locals.adminrights == 'blog') && (category.cattype == 'blogCategory')) ||
-                    (res.locals.adminrights.toString() == category.rootcategory.toString()) ||
-                    (res.locals.adminrights.toString() == category._id.toString())
-                ){
+                res.locals.page = "editcategory";
+                res.locals.title = "Редактор категории " + category.title;
 
-                    res.locals.page = "editcategory";
-                    res.locals.title = "Редактор категории " + category.title;
-                    res.locals.crumbs = "";
+                if (req.params.lang){
 
-                    Categories.find({isroot: true}, function(err, roots){
+                    Categories.findOne({parent: req.params.id, lang: req.params.lang}, function(err, lcategory){
 
-                        if (roots &&(roots.length > 0)){
-                            res.locals.roots = roots;
-                            for (var i=0; i<roots.length; i++){
-                                if (category.rootcategory == roots[i]._id){
-                                    res.locals.crumbs = '<a href="/admin/categories/' + roots[i]._id + '">' + roots[i].title + '</a> > ' + category.title;
-                                }
-                            }
-                        } else {
-                            res.locals.roots = [];
-                        }
+                        res.locals.lang = req.params.lang;
+                        res.locals.parent = req.params.id;
 
-                        if (req.params.lang){
+                        if (lcategory){
 
-                            Categories.findOne({parent: req.params.id, lang: req.params.lang}, function(err, lcategory){
-
-                                res.locals.lang = req.params.lang;
-                                res.locals.parent = req.params.id;
-
-                                if (lcategory){
-
-                                    res.locals.category = lcategory;
-
-                                } else {
-
-                                    var tempCat = {};
-                                    tempCat.title = '';
-                                    tempCat.alias = '';
-                                    tempCat.shortdescription = '';
-                                    tempCat.htmltitle = '';
-                                    tempCat.htmldescription = '';
-                                    tempCat.htmlkeywords = '';
-                                    tempCat.menutitle = '';
-                                    tempCat.cattype = category.cattype;
-
-                                    res.locals.category = tempCat;
-                                }
-
-                                res.render('./admin/editcategory/editcategory');
-                            })
+                            res.locals.category = lcategory;
 
                         } else {
 
-                            res.locals.category = category;
-                            res.locals.lang = "default";
-                            res.locals.parent = 'me';
-                            res.render('./admin/editcategory/editcategory');
+                            var tempCat = {};
+                            tempCat.title = '';
+                            tempCat.alias = '';
+                            tempCat.shortdescription = '';
+                            tempCat.htmltitle = '';
+                            tempCat.htmldescription = '';
+                            tempCat.htmlkeywords = '';
+                            tempCat.menutitle = '';
+                            tempCat.cattype = category.cattype;
+
+                            res.locals.category = tempCat;
                         }
+
+                        res.render('./admin/editcategory/editcategory');
                     })
 
                 } else {
 
-                    res.render('./admin/login/login');
+                    res.locals.category = category;
+                    res.locals.lang = "default";
+                    res.locals.parent = 'me';
+                    res.render('./admin/editcategory/editcategory');
                 }
-
 
             } else {
                 res.locals.title = '404 Ничего не найдено';
@@ -96,33 +67,23 @@ exports.post = function(req, res){
 
     if (req.body.action == 'newcategory'){
 
-        Categories.findOne({alias: req.body.alias}, function(err, cat){
+        Categories.createCategory(req.body.title, req.body.alias, req.body.pos, req.body.moderator, function(err, category){
 
-            if (cat){
+            if (category){
+                var page = 'categories';
 
-                res.send("Категория с таким URL уже существует!")
-
-            } else {
-
-                Categories.createCategory(req.body.title, req.body.alias, req.body.pos, req.body.moderator, function(err, category){
-                    if (category){
-                        var page = 'categories';
-
-                        category.subcount = 0;
-                        res.render('./admin/categories/item', {item:category, page:page}, function(err, html){
-                            if (err){
-                                log.error('------------- Error: ' + err);
-                                res.send({result: ''});
-                            } else {
-                                res.send({result: html});
-                            }
-                        });
+                category.subcount = 0;
+                res.render('./admin/categories/item', {item:category, page:page}, function(err, html){
+                    if (err){
+                        log.error('------------- Error: ' + err);
+                        res.send({result: ''});
                     } else {
-                        res.send(err)
+                        res.send({result: html});
                     }
                 });
+            } else {
+                res.send(err);
             }
-
         });
 
     } else if (req.body.action == 'posupdate'){
@@ -137,155 +98,118 @@ exports.post = function(req, res){
 
     } else if (req.body.action == 'editcategory'){
 
-        Categories.findOne({alias: req.body.alias, lang: 'default'}, function(err, cat){
+        var ismain = null;
+        var alias = null;
+        var isLocal = false;
 
-            if (cat && (cat._id != req.body.id)){
+        if (req.body.lang == 'default'){
 
-                res.send("Категория с таким URL уже существует!")
+           ismain = false;
+           alias = req.body.alias;
+
+            if (req.body.ismain == 'true'){
+                ismain = true;
+
+                Categories.setMain('all', false, function (err) {
+
+                    if (err){
+                        res.send(err);
+                    } else {
+
+                        editCategory(isLocal, function (err, id) {
+                            if (err){
+                                res.send(err);
+                            } else {
+
+                                Categories.setMain(req.body.id, true, function (err) {
+                                    if (err){
+                                        res.send(err);
+                                    } else {
+                                        res.send({id: id});
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
 
             } else {
 
-                if (req.body.lang == 'default'){
-
-                    var ismain = false;
-
-                    if (req.body.ismain == 'true'){
-                        ismain = true;
-
-                        Categories.update(
-                            {},
-                            {$set: {
-                                    ismain: false
-                                }},
-                            {multi: true},
-                            function(err){
-
-                                if (err){
-                                    res.send(err);
-                                } else {
-
-                                    Categories.editCategory(req.body.lang,
-                                        req.body.id,
-                                        req.body.title,
-                                        req.body.shortdescription,
-                                        req.body.description,
-                                        req.body.htmltitle,
-                                        req.body.htmldescription,
-                                        req.body.htmlkeywords,
-                                        req.body.alias,
-                                        req.body.menutitle,
-                                        ismain,
-                                        req.body.moderator,
-
-                                        function(err){
-
-                                            if (err){
-                                                res.send(err);
-                                            } else {
-
-                                                Categories.update(
-                                                    {parent: req.body.id},
-                                                    {$set: {
-                                                        ismain: true
-                                                    }},
-                                                    {multi: true},
-                                                    function(err){
-
-                                                        if (err){
-                                                            res.send(err);
-                                                        } else {
-                                                            res.send({id: req.body.id});
-                                                        }
-                                                    });
-                                            }
-
-                                    });
-                                }
-                            }
-                        )
-
+                editCategory(isLocal, function (err, id) {
+                    if (err){
+                        res.send(err);
                     } else {
-
-                        Categories.editCategory(
-                            req.body.lang,
-                            req.body.id,
-                            req.body.title,
-                            req.body.shortdescription,
-                            req.body.description,
-                            req.body.htmltitle,
-                            req.body.htmldescription,
-                            req.body.htmlkeywords,
-                            req.body.alias,
-                            req.body.menutitle,
-                            ismain,
-                            req.body.moderator,
-
-                            function(err){
-
-                                if (err){
-                                    res.send(err);
-                                } else {
-                                    res.send({id: req.body.id});
-                                }
-                        });
+                        res.send({id: id});
                     }
-
-                } else {
-
-                    Categories.findOne({_id: req.body.id}, function(err, category){
-
-                        if (category){
-
-                            Categories.editCategory(
-                                req.body.lang,
-                                req.body.id,
-                                req.body.title,
-                                req.body.shortdescription,
-                                req.body.description,
-                                req.body.htmltitle,
-                                req.body.htmldescription,
-                                req.body.htmlkeywords,
-                                null,
-                                req.body.menutitle,
-                                null,
-                                req.body.moderator,
-
-                                function(err){
-
-                                    if (err){
-                                        res.send(err);
-                                    } else {
-                                        res.send({id: req.body.id});
-                                    }
-                            });
-                        } else {
-
-                            Categories.createLocal(
-                                req.body.parent,
-                                req.body.lang,
-                                req.body.title,
-                                req.body.shortdescription,
-                                req.body.description,
-                                req.body.htmltitle,
-                                req.body.htmldescription,
-                                req.body.htmlkeywords,
-                                req.body.menutitle,
-                                req.body.moderator,
-
-                                function(err, result){
-
-                                    if (err){
-                                        res.send(err);
-                                    } else {
-                                        res.send({id: result._id});
-                                    }
-                            })
-                        }
-                    })
-                }
+                });
             }
-        });
 
+        } else {
+
+            Categories.findOne({_id: req.body.id}, function(err, category){
+
+                if (!category){
+                    isLocal = true;
+                }
+
+                editCategory(isLocal, function (err, id) {
+                    if (err){
+                        res.send(err);
+                    } else {
+                        res.send({id: id});
+                    }
+                });
+            });
+        }
+
+        function editCategory(isLocal, callback) {
+
+            if (isLocal) {
+                Categories.createLocal(
+                    req.body.parent,
+                    req.body.lang,
+                    req.body.title,
+                    req.body.shortdescription,
+                    req.body.description,
+                    req.body.htmltitle,
+                    req.body.htmldescription,
+                    req.body.htmlkeywords,
+                    req.body.menutitle,
+                    req.body.moderator,
+
+                    function(err, result){
+
+                        if (err){
+                            callback(err);
+                        } else {
+                            callback(null, result._id);
+                        }
+                    });
+            } else {
+                Categories.editCategory(
+                    req.body.lang,
+                    req.body.id,
+                    req.body.title,
+                    req.body.shortdescription,
+                    req.body.description,
+                    req.body.htmltitle,
+                    req.body.htmldescription,
+                    req.body.htmlkeywords,
+                    alias,
+                    req.body.menutitle,
+                    ismain,
+                    req.body.moderator,
+
+                    function(err){
+
+                        if (err){
+                            callback(err);
+                        } else {
+                            callback(null, req.body.id);
+                        }
+                    });
+            }
+        }
     } else if (req.body.action == 'savedescription'){
 
         Categories.saveDescription(req.body.id, req.body.html, function(err){
