@@ -5,40 +5,51 @@ module.exports = function(app){
 //************ Admin ************//
 //=====================================================//
 
-    app.get('/admin', require('./admin/admin').get);
-    app.post('/login', require('./admin/login').post);
-    app.get('/admin/logout', require('./admin/logout').get);
+    var startAdminRoute = require('./admin/admin');
+    app.get('/admin', startAdminRoute.get);
+    var loginRoute = require('./admin/login');
+    app.post('/login', loginRoute.post);
+    var logoutRoute = require('./admin/logout');
+    app.get('/admin/logout', logoutRoute.get);
 
     //====================== Categories ==========================//
-    app.get('/admin/categories', require('./admin/categories').get);
-    app.post('/admin/categories', require('./admin/editcategory').post);
+    var categoriesListRoute = require('./admin/categories');
+    app.get('/admin/categories', categoriesListRoute.get);
 
-    app.get('/admin/editcategory/:id', require('./admin/editcategory').get);
-    app.get('/admin/editcategory/:id/:lang', require('./admin/editcategory').get);
+    var editCategoryRoute = require('./admin/editcategory');
+    app.post('/admin/categories', editCategoryRoute.post);
+
+    app.get('/admin/editcategory/:id', editCategoryRoute.get);
+    app.get('/admin/editcategory/:id/:lang', editCategoryRoute.get);
 
     //====================== Articles ==========================//
-    app.get('/admin/articles/:id', require('./admin/articles').get);
-    app.post('/admin/articles', require('./admin/articles').post);
+    var articlesListRoute = require('./admin/articles');
+    app.get('/admin/articles/:id', articlesListRoute.get);
+    app.post('/admin/articles', articlesListRoute.post);
 
-    app.get('/admin/article/:id/:label', require('./admin/editarticle').get);
-    app.get('/admin/article/:id/:label/:lang', require('./admin/editarticle').get);
-    app.post('/admin/article', require('./admin/editarticle').post);
+    var editArticleRoute = require('./admin/editarticle');
+    app.get('/admin/article/:id/:label', editArticleRoute.get);
+    app.get('/admin/article/:id/:label/:lang', editArticleRoute.get);
+    app.post('/admin/article', editArticleRoute.post);
 
 //=====================================================//
 //************ Client ************//
 //=====================================================//
 
     //====================== Categories ==========================//
-    app.get('/', require('./client/category').get);
-    app.get('/:alias', require('./client/category').get);
+    var categoryRoute = require('./client/category');
+    app.get('/', categoryRoute.get);
+    app.get('/:alias', categoryRoute.get);
 
-    app.post('/', require('./client/category').post);
+    app.post('/', categoryRoute.post);
 
     //====================== Articles ==========================//
-    app.get('/article/:alias', require('./client/article').get);
+    var articleRoute = require('./client/article');
+    app.get('/article/:alias', articleRoute.get);
 
     //====================== Tags ==========================//
-    app.get('/articles/:tag', require('./client/tag').get);
-    app.post('/tag', require('./client/tag').post);
+    var tagRoute = require('./client/tag');
+    app.get('/articles/:tag', tagRoute.get);
+    app.post('/tag', tagRoute.post);
 
 };
