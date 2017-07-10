@@ -210,16 +210,6 @@ exports.post = function(req, res){
                     });
             }
         }
-    } else if (req.body.action == 'savedescription'){
-
-        Categories.saveDescription(req.body.id, req.body.html, function(err){
-            if (err){
-                res.send(err);
-            } else {
-                res.send({ok: "Ok"});
-            }
-        });
-
     } else if (req.body.action == 'deletecategory'){
 
         function removeCategory(id, callback){
@@ -228,12 +218,7 @@ exports.post = function(req, res){
                 if (err){
                     callback(err);
                 } else {
-                    fileupload.removeFolder('../files/categories/' + id, function(err){
-                        if (err) {
-                            log.error('------removeFolder error: ' + err);
-                        }
-                        callback();
-                    })
+                    callback(null);
                 }
             })
         }

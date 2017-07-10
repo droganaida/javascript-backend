@@ -46,9 +46,6 @@ var schema = new Schema({
         type: Boolean,
         default: false
     },
-    icon: {
-        type: String
-    },
     creator: {
         type: String
     },
@@ -140,6 +137,8 @@ schema.statics = {
         if (isMain){
             params = {parent: parentId}
         }
+
+        var Categories = this;
 
         Categories.update(
             params,
