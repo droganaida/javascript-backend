@@ -1,5 +1,5 @@
 <%-include ../modules/dateParser%>
-<div class="holder type flex-container flex-col padding20" id="<%=category.cattype%>">
+<div class="holder type flex-container flex-col padding20">
     <div class="options-header">
         <%
             var cparent = parent;
@@ -104,16 +104,10 @@
     <div class="flex-col flex-full padding20">
         <div class="buttons id-info flex-row flex-centered" data-parent="<%=parent%>" data-lang="<%=lang%>" id="<%=category._id%>">
             <div class="button green" id="edit-category">Сохранить</div>
-            <% if ((adminrights == "superadmin") || !category.isroot) { %>
-                <div class="button red" id="delete-category" data-bloglabel="<%=category.rootcategory%>">Удалить</div>
+            <% if (adminrights == "superadmin") { %>
+                <div class="button red" id="delete-category">Удалить</div>
             <% } %>
-            <% if (category.isroot) { %>
-                <a href="/admin/categories" class="button">Отмена</a>
-            <% } else if (category.rootcategory == 'me') { %>
-                <a href="/admin/blogcategories" class="button">Отмена</a>
-            <% } else { %>
-                <a href="/admin/categories/<%=category.rootcategory%>" class="button">Отмена</a>
-            <% } %>
+            <a href="/admin/categories" class="button">Отмена</a>
         </div>
     </div>
 </div>
