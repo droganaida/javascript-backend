@@ -239,9 +239,9 @@ $(document).ready(function(){
                 saveArticle('editarticle', button);
             });
             //------------ }
+        } else {
+            saveArticle('editarticle', button);
         }
-
-        saveArticle('editarticle', button);
 
     });
 

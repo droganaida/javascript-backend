@@ -54,17 +54,6 @@ if (cluster.isMaster) {
             limits: {
                 fieldNameSize: 999999999,
                 fieldSize: 999999999
-            },
-            includeEmptyFields: true,
-            inMemory: true,
-            onParseEnd: function(req, next) {
-                next();
-            },
-            onError: function(e, next) {
-                if (e) {
-                    log.error( '------------Error: ' + e.stack);
-                }
-                next();
             }
         }
     ).any());

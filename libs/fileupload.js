@@ -87,7 +87,7 @@ function removeFolder(location, next) {
 //================================================================================================//
 
 function imResize(file, width, height, dest, callback){
-    
+
     im.resize({
         srcPath: file,
         dstPath: dest,
@@ -125,7 +125,7 @@ function sqCrop(fileName, size, features, callback){
                 if (err){
                     callback(err);
                 } else {
-                    
+
                     fileUnlink(fileTemp, function(err){
                         if (err){
                             callback(err);
@@ -165,7 +165,7 @@ function sqCrop(fileName, size, features, callback){
         })
     } else {
 
-        imResize(fileName, 120, 120, fileThumb, function(err){
+        imResize(fileName, size, size, fileThumb, function(err){
             if (err){
                 callback(err);
             } else {
