@@ -1,15 +1,9 @@
 <%-include ./dateParser%>
-<% var alias = article.alias
-if (article.parent && article.parent.alias){
-    alias = article.parent.alias
-} %>
 <article>
-    <a href="/article/<%=alias%><%=urltail%>">
+    <a href="/article/<%=article.alias%>">
         <%  var image = "/images/noimage.jpg"
             if (article.image){
                 image = article.image
-            } else if (article.parent && article.parent.image){
-                image = article.parent.image
             }
             image = image.substr(0, image.lastIndexOf('.')) + "-slide" +
                 image.substr(image.lastIndexOf('.'))

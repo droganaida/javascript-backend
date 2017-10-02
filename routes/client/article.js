@@ -17,7 +17,7 @@ exports.get = function(req, res){
 
             } else {
 
-                findLocal(article, res.locals.language, function(resArticle){
+                findLocal(article, res.locals.language, true, function(resArticle){
 
                     if (resArticle){
 
@@ -58,26 +58,24 @@ exports.get = function(req, res){
 
                     } else {
 
-                        localizeArticles(relarticles, res.locals.language, article, function(relArray){
+                        localizeArticles(relarticles, res.locals.language, article, true, function(relArray){
                             res.locals.relarticles = relArray;
                             res.render('./client/article/article');
                         });
                     }
             });
-
         });
     }
-
 };
 
-function localizeArticles(articles, language, mainArticle, callback){
+function localizeArticles(articles, language, mainArticle, needTranslation, callback){
 
     var relArray = [];
     var counter = 0;
 
     for (var i=0; i<articles.length; i++){
 
-        findLocal(articles[i], language, function(localArticle){
+        findLocal(articles[i], language, needTranslation, function(localArticle){
 
             counter ++;
 
@@ -93,22 +91,92 @@ function localizeArticles(articles, language, mainArticle, callback){
     }
 }
 
-function findLocal(article, language, callback){
+function findLocal(article, language, needTranslation, callback){
 
-    Articles.findOne({parent: article._id, lang: language}, function(err, rArticle){
-        if (rArticle){
-            var tArticle = rArticle.toObject();
-            tArticle.parent = article;
-            callback(tArticle);
+    if (article.lang == 'default' && (language == 'default')) {
+
+        callback(article);
+    } else {
+
+        var params = {};
+        if (needTranslation){
+            params.parent = article._id;
+            params.lang = language;
         } else {
-            callback(null);
+            params._id = article.parent;
         }
-    });
+
+        Articles.findOne(params, function(err, rArticle){
+
+            if (rArticle){
+
+                if (needTranslation) {
+                    var tArticle = rArticle.toObject();
+                    tArticle.alias = article.alias + "?language=" + rArticle.lang;
+                    tArticle.image = article.image;
+                    callback(tArticle);
+                } else {
+                    article.image = rArticle.image;
+                    article.alias = rArticle.alias + "?language=" + article.lang;
+                    callback(article);
+                }
+            } else {
+                callback(null);
+            }
+        });
+    }
 }
 
 exports.localize = function(articles, language, mainArticle, callback){
 
-    localizeArticles(articles, language, mainArticle, function(localizedArticles){
+    localizeArticles(articles, language, mainArticle, true, function(localizedArticles){
         callback(localizedArticles);
     })
+};
+
+exports.findArticles = function(params, lang, mainArticle, needTranslation, callback){
+
+    Articles
+        .find(params)
+        .sort({moderated: -1})
+        .limit(MyConfig.limits.pageArticles)
+        .exec(function(err, articles){
+
+            var isMore = false;
+            var last = 'none';
+            var notFound = false;
+            var articleArray = [];
+
+            if (articles && (articles.length > 0)){
+
+                if (articles.length == MyConfig.limits.pageArticles){
+
+                    var lastDate = articles[articles.length - 1].moderated;
+                    params.moderated = {$lt: lastDate};
+                    Articles.findOne(params, function(err, nextArticle){
+
+                        if (nextArticle){
+                            isMore = true;
+                            last = lastDate;
+                        } else {
+                            isMore = false;
+                        }
+                        getResLocals();
+                    })
+                } else {
+                    getResLocals();
+                }
+
+                function getResLocals(){
+
+                    localizeArticles(articles, lang, mainArticle, needTranslation, function(localizedArticles){
+                        callback(localizedArticles, isMore, last, notFound);
+                    });
+                }
+
+            } else {
+                notFound = true;
+                callback(articleArray, isMore, last, notFound);
+            }
+        });
 };

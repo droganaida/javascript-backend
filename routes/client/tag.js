@@ -1,7 +1,6 @@
 
-var Articles = require('../../models/articles').Article;
-var MyConfig = require('../../libs/myconfig');
 var log = require('../../libs/log')(module);
+var Localizer = require('./article');
 
 exports.get = function(req, res){
 
@@ -15,7 +14,7 @@ exports.get = function(req, res){
     params.tags = req.params.tag;
     params.published = true;
 
-    findArticles(params, function(articles, isMore, last, notFound){
+    Localizer.findArticles(params, 'default', null, false, function(articles, isMore, last, notFound){
 
         res.locals.articles = articles;
 
@@ -33,84 +32,6 @@ exports.get = function(req, res){
 
 };
 
-function findArticles(params, callback){
-
-    Articles
-        .find(params)
-        .sort({moderated: -1})
-        .limit(MyConfig.limits.pageArticles)
-        .exec(function(err, articles){
-
-            var isMore = false;
-            var last = 'none';
-            var notFound = false;
-            var articleArray = [];
-
-            if (articles && (articles.length > 0)){
-
-                var counter = 0;
-                var indexArray = [];
-
-                if (articles.length == MyConfig.limits.pageArticles){
-
-                    var lastDate = articles[articles.length - 1].moderated;
-                    params.moderated = {$lt: lastDate};
-                    Articles.findOne(params, function(err, nextArticle){
-
-                        if (nextArticle){
-                            isMore = true;
-                            last = lastDate;
-                        } else {
-                            isMore = false;
-                        }
-                        getResLocals();
-                    })
-                } else {
-                    getResLocals();
-                }
-
-                function getResLocals(){
-
-                    for (var i=0; i<articles.length; i++){
-
-                        indexArray.push(articles[i]._id.toString());
-
-                        checkParent(articles[i], function(rArticle){
-
-                            counter++;
-                            var pos = indexArray.indexOf(rArticle._id.toString());
-                            articleArray[pos] = rArticle;
-
-                            if (counter == articles.length){
-
-                                callback(articleArray, isMore, last, notFound);
-                            }
-                        })
-                    }
-                }
-
-            } else {
-                notFound = true;
-                callback(articleArray, isMore, last, notFound);
-            }
-        });
-
-    function checkParent(article, callback){
-
-        if (article.lang == 'default'){
-            callback(article);
-        } else {
-            Articles.findOne({_id: article.parent}, function(err, parent){
-                if (parent){
-                    article.image = parent.image;
-                    article.alias = parent.alias + "?language=" + article.lang;
-                }
-                callback(article);
-            });
-        }
-    }
-}
-
 exports.post = function(req, res){
 
     if (req.body.action == 'more'){
@@ -122,7 +43,8 @@ exports.post = function(req, res){
         params.moderated = {$lt: date};
         params.published = true;
 
-        findArticles(params, function(articles, isMore, last){
+        Localizer.findArticles(params, 'default', null, false, function(articles, isMore, last, notFound){
+
             res.render('./client/modules/articleItemArray', {articles: articles}, function(err, html){
                 var data = {};
                 if (isMore){

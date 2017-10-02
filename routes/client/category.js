@@ -1,9 +1,7 @@
 
 var log = require('../../libs/log')(module);
 var async = require('async');
-var MyConfig = require('../../libs/myconfig');
 var Categories = require('../../models/categories').Category;
-var Articles = require('../../models/articles').Article;
 var Localizer = require('./article');
 
 exports.get = function(req, res){
@@ -94,7 +92,8 @@ exports.get = function(req, res){
 
             articleSearchParams.categories = parent._id.toString();
 
-            searchArticles(articleSearchParams, res.locals.language, function(articles, isMore, last){
+            Localizer.findArticles(articleSearchParams, res.locals.language, null, true, function(articles, isMore, last, notFound){
+
                 if (isMore){
                     res.locals.showMore = true;
                     res.locals.from = last;
@@ -110,7 +109,8 @@ exports.get = function(req, res){
     function getArticles(callback){
 
         if (isMain){
-            searchArticles(articleSearchParams, res.locals.language, function(articles, isMore, last){
+            Localizer.findArticles(articleSearchParams, res.locals.language, null, true, function(articles, isMore, last, notFound){
+
                 if (isMore){
                     res.locals.showMore = true;
                     res.locals.from = last;
@@ -124,52 +124,6 @@ exports.get = function(req, res){
     }
 
 };
-
-function searchArticles(params, lang, callback){
-
-    Articles
-        .find(params)
-        .sort({moderated: -1})
-        .limit(MyConfig.limits.pageArticles)
-        .exec(function(err, articles){
-
-            var isMore = false;
-            var last = 'none';
-
-            if (articles && (articles.length > 0)){
-
-                if (articles.length == MyConfig.limits.pageArticles){
-
-                    var lastDate = articles[articles.length - 1].moderated;
-                    params.moderated = {$lt: lastDate};
-                    Articles.findOne(params, function(err, nextArticle){
-
-                        if (nextArticle){
-                            isMore = true;
-                            last = lastDate;
-                        } else {
-                            isMore = false;
-                        }
-                        getResLocals();
-                    })
-                } else {
-                    getResLocals();
-                }
-
-                function getResLocals(){
-                    if (lang == 'default'){
-                        callback(articles, isMore, last);
-                    } else {
-                        Localizer.localize(articles, lang, null, function(localizedArticles){
-                            callback(localizedArticles, isMore, last);
-                        })
-                    }
-                }
-            } else {
-                callback([], isMore, last);
-            }
-        })
-}
 
 exports.post = function(req, res){
 
@@ -188,7 +142,8 @@ exports.post = function(req, res){
         params.moderated = {$lt: date};
         params.published = true;
 
-        searchArticles(params, req.body.language, function(articles, isMore, last){
+        Localizer.findArticles(params, req.body.language, null, true, function(articles, isMore, last, notFound){
+
             res.render('./client/modules/articleItemArray', {articles: articles}, function(err, html){
                 var data = {};
                 if (isMore){

@@ -1,13 +1,7 @@
-<% var alias = article.alias
-    if (article.parent){
-        alias = article.parent.alias
-    } %>
-<a href="/article/<%=alias%><%=urltail%>">
+<a href="/article/<%=article.alias%>">
     <%  var image = "/images/noimage.jpg"
     if (article.image){
         image = article.image
-    } else if (article.parent && article.parent.image){
-        image = article.parent.image
     }
     image = image.substr(0, image.lastIndexOf('.')) + "-min" +
             image.substr(image.lastIndexOf('.'))
